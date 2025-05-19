@@ -28,6 +28,7 @@ audio_ext = (".mp3", ".m4a", ".m4b", ".m4p", ".aa", ".wav")
 list_ext = (".pls", ".m3u")
 
 # creates a directory if it doesn't exist
+# done
 def make_dir_if_absent(path):
     try:
         os.makedirs(path)
@@ -36,6 +37,7 @@ def make_dir_if_absent(path):
             raise
 
 # returns false for latin characters
+# done
 def raises_unicode_error(str):
     try:
         str.encode('latin-1')
@@ -44,11 +46,13 @@ def raises_unicode_error(str):
         return True
 
 # converts non-latin characters into hash code
+# skipping this, not needed
 def hash_error_unicode(item):
     item_bytes = item.encode('utf-8')
     return "".join(["{0:02X}".format(ord(x)) for x in reversed(hashlib.md5(item_bytes).hexdigest()[:8])])
 
 # looks for non-latin characters and then hashes them
+# skipping this, not needed
 def validate_unicode(path):
     path_list = path.split('/')
     last_raise = False
@@ -62,6 +66,7 @@ def validate_unicode(path):
     return "/".join(path_list) + (extension if last_raise and extension in audio_ext else '')
 
 # checks to see if command can be run or not in the system
+# done
 def exec_exists_in_path(command):
     with open(os.devnull, 'w') as FNULL:
         try:
@@ -72,19 +77,23 @@ def exec_exists_in_path(command):
             return False
 
 # splits the path
+# done
 def splitpath(path):
     return path.split(os.sep)
 
 # finds shared starting folder
+# done
 def get_relpath(path, basepath):
     commonprefix = os.sep.join(os.path.commonprefix(list(map(splitpath, [path, basepath]))))
     return os.path.relpath(path, commonprefix)
 
 # checks if a directory is inside of another directory
+# done
 def is_path_prefix(prefix, path):
     return prefix == os.sep.join(os.path.commonprefix(list(map(splitpath, [prefix, path]))))
 
 # groups the songs by the metadata
+# will work on it later
 def group_tracks_by_id3_template(tracks, template):
     grouped_tracks_dict = {}
     template_vars = set(re.findall(r'{.*?}', template))
@@ -111,7 +120,7 @@ def group_tracks_by_id3_template(tracks, template):
 
 # <---------------------------------------------------------------------------------------------------------------------------------------------->
 
-
+# clss for text 2 speech
 class Text2Speech(object):
 
     # list of text to speech programs

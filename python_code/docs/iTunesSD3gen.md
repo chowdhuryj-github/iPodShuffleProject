@@ -1,4 +1,4 @@
-<h1 id="toc0"><a name="iTunesStats"></a>iTunesSD3gen</h1>
+    <h1 id="toc0"><a name="iTunesStats"></a>iTunesSD3gen</h1>
 Here it is. The reason for this wiki. The third generation shuffle iTunesSD format.<br>
 Just like in the iTunesDB the default size for integer numbers seems to be 32 bit. In earlier iTunesSD files it was a rather odd 24 bit.<br>
 Like the iTunesDB new third generation shuffle's iTunesSD is little endian. Earlier iTunesSD files were big endian.<br>
