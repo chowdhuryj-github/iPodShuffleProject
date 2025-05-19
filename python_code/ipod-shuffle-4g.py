@@ -526,8 +526,10 @@ class PlaylistHeader(Record):
     
 # <---------------------------------------------------------------------------------------------------------------------------------------------->
 
-
+# one playlist entry in the iPod's database
 class Playlist(Record):
+
+    # set up a playlist record
     def __init__(self, parent):
         self.listtracks = []
         Record.__init__(self, parent)
@@ -541,6 +543,7 @@ class Playlist(Record):
                           ("unknown1", ("16s", b"\x00" * 16))
                                               ])
 
+    # building the master playlist that contains all tracks 
     def set_master(self, tracks):
         # By default use "All Songs" builtin voiceover (dbid all zero)
         # Else generate alternative "All Songs" to fit the speaker voice of other playlists
@@ -550,6 +553,7 @@ class Playlist(Record):
         self["listtype"] = 1
         self.listtracks = tracks
 
+    # reads lines of m3u
     def populate_m3u(self, data):
         listtracks = []
         for i in data:
@@ -560,6 +564,7 @@ class Playlist(Record):
                 listtracks.append(path)
         return listtracks
 
+    # reads lines of pls
     def populate_pls(self, data):
         sorttracks = []
         for i in data:
@@ -575,6 +580,7 @@ class Playlist(Record):
         listtracks = [ x for (_, x) in sorted(sorttracks) ]
         return listtracks
 
+    # collects all audio diles and returns absolute file paths
     def populate_directory(self, playlistpath, recursive = True):
         # Add all tracks inside the folder and its subfolders recursively.
         # Folders containing no music and only a single Album
@@ -595,6 +601,7 @@ class Playlist(Record):
                 break
         return listtracks
 
+    # produces a absolute file path
     def remove_relatives(self, relative, filename):
         base = os.path.dirname(os.path.abspath(filename))
         if not os.path.exists(relative):
@@ -602,6 +609,7 @@ class Playlist(Record):
         fullPath = relative
         return fullPath
 
+    # sets up voice over for a playlist
     def populate(self, obj):
         # Create a playlist of the folder and all subfolders
         if type(obj) == type(()):
@@ -634,6 +642,7 @@ class Playlist(Record):
         self["dbid"] = hashlib.md5(text.encode('utf-8')).digest()[:8]
         self.text_to_speech(text, self["dbid"], True)
 
+    # serialize the playlist into bytes
     def construct(self, tracks):
         self["total_length"] = 44 + (4 * len(self.listtracks))
         self["number_of_songs"] = 0
@@ -659,8 +668,10 @@ class Playlist(Record):
 
 # <---------------------------------------------------------------------------------------------------------------------------------------------->
 
-
+# the iPod builder class
 class Shuffler(object):
+
+    # the constructor for the shuffler
     def __init__(self, path, track_voiceover=False, playlist_voiceover=False, rename=False, trackgain=0, auto_dir_playlists=None, auto_id3_playlists=None):
         self.path = os.path.abspath(path)
         self.tracks = []
@@ -675,6 +686,7 @@ class Shuffler(object):
         self.auto_dir_playlists = auto_dir_playlists
         self.auto_id3_playlists = auto_id3_playlists
 
+    # prepared iPod directory for a fresh database
     def initialize(self):
       # remove existing voiceover files (they are either useless or will be overwritten anyway)
       for dirname in ('iPod_Control/Speakable/Playlists', 'iPod_Control/Speakable/Tracks'):
@@ -682,6 +694,7 @@ class Shuffler(object):
       for dirname in ('iPod_Control/iTunes', 'iPod_Control/Music', 'iPod_Control/Speakable/Playlists', 'iPod_Control/Speakable/Tracks'):
           make_dir_if_absent(os.path.join(self.path, dirname))
 
+    # a debug printer
     def dump_state(self):
         print("Shuffle DB state")
         print("Tracks", self.tracks)
@@ -689,6 +702,7 @@ class Shuffler(object):
         print("Artists", self.artists)
         print("Playlists", self.lists)
 
+    # used to look for music library and playlists
     def populate(self):
         self.tunessd = TunesSD(self)
         for (dirpath, dirnames, filenames) in os.walk(self.path):
@@ -721,6 +735,7 @@ class Shuffler(object):
                 print("Error: No mutagen found. Cannot generate auto-id3-playlists.")
                 sys.exit(1)
 
+    # writes to the database
     def write_database(self):
         print("Writing database. This may take a while...")
         with open(os.path.join(self.path, "iPod_Control", "iTunes", "iTunesSD"), "wb") as f:
@@ -745,6 +760,7 @@ class Shuffler(object):
 # Use SVOX pico2wave and RHVoice to produce voiceover data
 #
 
+# looks for names that can't be encoded in latin
 def check_unicode(path):
     ret_flag = False # True if there is a recognizable file within this level
     for item in os.listdir(path):
@@ -766,6 +782,7 @@ def check_unicode(path):
                 os.rename(src, dest)
     return ret_flag
 
+# converts input into a integer
 def nonnegative_int(string):
     try:
         intval = int(string)
@@ -776,6 +793,7 @@ def nonnegative_int(string):
         raise argparse.ArgumentTypeError("Track gain value should be in range 0-99")
     return intval
 
+# checks validity of the path
 def checkPathValidity(path):
     if not os.path.isdir(result.path):
         print("Error finding IPod directory. Maybe it is not connected or mounted?")
@@ -785,10 +803,12 @@ def checkPathValidity(path):
         print('Unable to get write permissions in the IPod directory')
         sys.exit(1)
 
+# designed to handle a interrupt
 def handle_interrupt(signal, frame):
     print("Interrupt detected, exiting...")
     sys.exit(1)
 
+# the entry point for the program
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, handle_interrupt)
 
