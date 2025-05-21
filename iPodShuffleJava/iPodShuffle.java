@@ -1,5 +1,5 @@
 
-package java_code;
+package iPodShuffleJava;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +10,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import iPodShuffleJava.Shuffler;
 
 public class iPodShuffle {
 
@@ -24,12 +26,12 @@ public class iPodShuffle {
         System.out.println("Hello there!");
 
         // testing
-        createDirectory("C:/GitHub/iPodShuffleProject/Salvin");
-        System.out.println(encodingCheck("Salvin"));
-        System.out.println(execExistsInPath("java --version"));
-        System.out.println(splitPath(pathOne));
-        System.out.println(getRelativePath(pathOne, pathTwo));
-        System.out.println("Calling isPathPrefix() " + isPathPrefix(pathOne, prefix));
+        // createDirectory("C:/GitHub/iPodShuffleProject/Salvin");
+        // System.out.println(encodingCheck("Salvin"));
+        // System.out.println(execExistsInPath("java --version"));
+        // System.out.println(splitPath(pathOne));
+        // System.out.println(getRelativePath(pathOne, pathTwo));
+        // System.out.println("Calling isPathPrefix() " + isPathPrefix(pathOne, prefix));
 
     }
 
@@ -38,7 +40,7 @@ public class iPodShuffle {
      * method for creating a directory!
      * @param pathToDirectory the path to where you'd like to make your directory
      */
-    private static void createDirectory(String pathToDirectory) {
+    public static void createDirectory(String pathToDirectory) {
 
         int lastSlashIndex = pathToDirectory.lastIndexOf("/");
         String fileName = pathToDirectory.substring(lastSlashIndex + 1);
@@ -62,7 +64,7 @@ public class iPodShuffle {
      * method for checking if the file name can be encoded
      * @param fileName name of the .mp3 to be encoded
      */
-    private static boolean encodingCheck(String fileName) {
+    public static boolean encodingCheck(String fileName) {
 
         CharsetEncoder encoder = Charset.forName("ISO-8859-1").newEncoder();
         if(encoder.canEncode(fileName)) {
@@ -79,7 +81,7 @@ public class iPodShuffle {
      * @param command the command being entered
      * @return if the command works or not
      */
-    private static boolean execExistsInPath(String command) {
+    public static boolean execExistsInPath(String command) {
 
         boolean commandWorks = true;
         ProcessBuilder builder = new ProcessBuilder(); // object used for running a command
@@ -110,7 +112,7 @@ public class iPodShuffle {
      * @param path the file path
      * @return a list of parts of the file path
      */
-    private static List<String> splitPath(String path) {
+    public static List<String> splitPath(String path) {
 
         List<String> pathParts = Arrays.asList(path.split("/"));
         return pathParts;
@@ -123,7 +125,7 @@ public class iPodShuffle {
      * @param basePath the root path
      * @return the relative path
      */
-    private static String getRelativePath(String path, String basePath) {
+    public static String getRelativePath(String path, String basePath) {
 
         List<String> pathToParts = splitPath(path);
         List<String> basePathToParts = splitPath(basePath);
@@ -151,7 +153,7 @@ public class iPodShuffle {
      * @param path the path we have
      * @return confirms if directory is inside 
      */
-    private static boolean isPathPrefix(String prefix, String path) {
+    public static boolean isPathPrefix(String prefix, String path) {
 
         Path paths = Paths.get(prefix).toAbsolutePath().normalize();     // .normalize() removes redundant things like ..
         Path prefixPath = Paths.get(path).toAbsolutePath().normalize();  // .toAbsolutePath() adds in the root directories and stuff
@@ -160,7 +162,6 @@ public class iPodShuffle {
 
     }
 
-    
 
 
 

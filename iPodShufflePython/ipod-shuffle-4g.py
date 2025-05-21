@@ -93,7 +93,7 @@ def is_path_prefix(prefix, path):
     return prefix == os.sep.join(os.path.commonprefix(list(map(splitpath, [prefix, path]))))
 
 # groups the songs by the metadata
-# will work on it later
+# not needed
 def group_tracks_by_id3_template(tracks, template):
     grouped_tracks_dict = {}
     template_vars = set(re.findall(r'{.*?}', template))
@@ -121,6 +121,7 @@ def group_tracks_by_id3_template(tracks, template):
 # <---------------------------------------------------------------------------------------------------------------------------------------------->
 
 # clss for text 2 speech
+# entire class not needed
 class Text2Speech(object):
 
     # list of text to speech programs
@@ -681,6 +682,7 @@ class Playlist(Record):
 class Shuffler(object):
 
     # the constructor for the shuffler
+    # done
     def __init__(self, path, track_voiceover=False, playlist_voiceover=False, rename=False, trackgain=0, auto_dir_playlists=None, auto_id3_playlists=None):
         self.path = os.path.abspath(path)
         self.tracks = []
@@ -696,6 +698,7 @@ class Shuffler(object):
         self.auto_id3_playlists = auto_id3_playlists
 
     # prepared iPod directory for a fresh database
+    # done
     def initialize(self):
       # remove existing voiceover files (they are either useless or will be overwritten anyway)
       for dirname in ('iPod_Control/Speakable/Playlists', 'iPod_Control/Speakable/Tracks'):
