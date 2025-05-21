@@ -42,19 +42,16 @@ public class iPodShuffle {
      */
     public static void createDirectory(String pathToDirectory) {
 
-        int lastSlashIndex = pathToDirectory.lastIndexOf("/");
-        String fileName = pathToDirectory.substring(lastSlashIndex + 1);
-        File directory = new File(fileName);
-        boolean createDirectory = directory.mkdir();
-
+        File directory = new File(pathToDirectory); // handles all paths
         if(directory.exists() && directory.isDirectory()) {
-            System.out.println("Directory Already Exists!");
-        }
-
-        if(!createDirectory) {
-            System.out.println("Failed to Create Directory");
+            System.out.println("Directory Exists!" + directory); 
         } else {
-            System.out.println("Directory Created!");
+            boolean createdDirectory = directory.mkdirs(); // creates all non-existing directories
+            if(createdDirectory) {
+                System.out.println("Directory Made!");
+            } else {
+                System.out.println("Directory Not Made!");
+            }
         }
 
     }

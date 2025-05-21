@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import iPodShuffleJava.iPodShuffle;
@@ -22,7 +23,7 @@ public class Shuffler {
     private List<String> albums;
     private List<String> artists;
     private List<String> lists;
-    private Object tunesSD;
+    private Object tunesSD; // to be worked on
 
 
 
@@ -47,9 +48,9 @@ public class Shuffler {
             this.albums = new ArrayList<>();
             this.artists = new ArrayList<>();
             this.lists = new ArrayList<>();
-            this.tunesSD = null;
+            this.tunesSD = null; // to be worked on
     }
-
+    
     /**
      * overloaded constructor
      * @param path root path to iPod storage device
@@ -58,27 +59,59 @@ public class Shuffler {
         this(path, false, false, false, 0, -1);
     }
 
-    private void initialize() {
+    public void initialize() throws IOException {
 
         String[] filePathsOne = {"iPod_Control/Speakable/Playlists", "iPod_Control/Speakable/Tracks" };
         for(int i = 0; i < filePathsOne.length; i++) {
-            Path directoryPathOne = Paths.get(this.path + filePathsOne[i]);
-            try {
-                Files.delete(directoryPathOne);
-                System.out.println("Directory Deleted: " + directoryPathOne);
-            } catch(IOException exception) {
-                System.out.println("Directory Deletion Failed");
-                exception.printStackTrace();
-            }
+            Path directoryPathOne = Paths.get(this.path, filePathsOne[i]);
+            deleteDirectoryRecursively(directoryPathOne);
         } 
 
         String[] filePathsTwo = {"iPod_Control/iTunes", "iPod_Control/Music", "iPod_Control/Speakable/Playlists",
             "iPod_Control/Speakable/Tracks"};
         for(int i = 0; i < filePathsTwo.length; i++) {
-            Path directoryPathTwo = Paths.get(this.path + filePathsTwo[i]);
+            Path directoryPathTwo = Paths.get(this.path, filePathsTwo[i]);
             iPodShuffle.createDirectory(directoryPathTwo.toString());
         }
     }
+
+    public String DumpState() {
+
+        StringBuilder shuffleState = new StringBuilder();
+
+        shuffleState.append("Shuffle DB State").append(System.lineSeparator());
+        shuffleState.append("Tracks: " + this.tracks).append(System.lineSeparator());
+        shuffleState.append("Albums: " + this.albums).append(System.lineSeparator());
+        shuffleState.append("Artists: " + this.artists).append(System.lineSeparator());
+        shuffleState.append("Playlists: " + this.lists).append(System.lineSeparator());
+
+        return shuffleState.toString();
+
+    }
+
+    
+    /**
+     * method for deleting the contents of a directory
+     * @param directoryPath the path of the directory to delete
+     * @throws IOException in case the deletion process fails
+     */
+    public void deleteDirectoryRecursively(Path directoryPath) throws IOException {
+        if(Files.exists(directoryPath)) {
+            Files.walk(directoryPath)
+                .sorted(Comparator.reverseOrder()) // delete child folder before the parent folder
+                .forEach(path -> {
+                    try {
+                        Files.delete(path);
+                        System.out.println("Deleted: "+ path);
+                    } catch(IOException exception) {
+                        System.out.println("Failed to Delete: " + path);
+                        exception.printStackTrace();
+                    }
+                });
+        }
+    }
+
+
 
 
 
