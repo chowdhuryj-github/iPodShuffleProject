@@ -8,8 +8,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import iPodShuffleJava.iPodShuffle;
-
+/**
+ * class for Shuffler
+ */
 public class Shuffler {
 
     protected String path;
@@ -75,6 +76,11 @@ public class Shuffler {
         }
     }
 
+
+    /**
+     * method for DumpState
+     * @return a string
+     */
     public String DumpState() {
 
         StringBuilder shuffleState = new StringBuilder();

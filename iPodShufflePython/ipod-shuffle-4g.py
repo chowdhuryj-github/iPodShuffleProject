@@ -387,9 +387,11 @@ class TunesSD(Record):
 # <---------------------------------------------------------------------------------------------------------------------------------------------->
 
 # table of contents for each record
+# done
 class TrackHeader(Record):
 
     # blueprint for building the track list section
+    # done
     def __init__(self, parent):
         self.base_offset = 0
         Record.__init__(self, parent)
@@ -401,6 +403,7 @@ class TrackHeader(Record):
                                              ])
     
     # building the complete track list section
+    # done
     def construct(self):
         self["number_of_tracks"] = len(self.tracks)
         self["total_length"] = 20 + (len(self.tracks) * 4)
@@ -419,9 +422,11 @@ class TrackHeader(Record):
 # <---------------------------------------------------------------------------------------------------------------------------------------------->
 
 # record for a song
+# done
 class Track(Record):
 
     # constructor for the record
+    # done
     def __init__(self, parent):
         Record.__init__(self, parent)
         self._struct = collections.OrderedDict([
@@ -453,6 +458,7 @@ class Track(Record):
                            ])
 
     # filling in the details of the record
+    # done
     def populate(self, filename):
         self["filename"] = self.path_to_ipod(filename).encode('utf-8')
 
@@ -490,6 +496,7 @@ class Track(Record):
                     text = " - ".join(audio.get("title", "") + audio.get("artist", ""))
 
         # Handle the VoiceOverData
+        # not needed
         if isinstance(text, str):
             text = text.encode('utf-8', 'ignore')
         self["dbid"] = hashlib.md5(text).digest()[:8]
@@ -777,6 +784,8 @@ class Shuffler(object):
         print("Albums", len(self.albums))
         print("Artists", len(self.artists))
         print("Playlists", len(self.lists))
+        
+# <---------------------------------------------------------------------------------------------------------------------------------------------->
 
 #
 # Read all files from the directory
