@@ -12,18 +12,18 @@ import iPodShuffleJava.iPodShuffle;
 
 public class Shuffler {
 
-    private String path;
-    private boolean trackVoiceOver;
-    private boolean playlistVoiceOver;
-    private boolean rename;
-    private int trackGain;
-    private int autoDirectoryPlaylists;
+    protected String path;
+    protected boolean trackVoiceOver;
+    protected boolean playlistVoiceOver;
+    protected boolean rename;
+    protected int trackGain;
+    protected int autoDirectoryPlaylists;
 
     private List<String> tracks;
     private List<String> albums;
     private List<String> artists;
     private List<String> lists;
-    private Object tunesSD; // to be worked on
+    private TunesSD tunesSD;
 
 
 
@@ -48,7 +48,7 @@ public class Shuffler {
             this.albums = new ArrayList<>();
             this.artists = new ArrayList<>();
             this.lists = new ArrayList<>();
-            this.tunesSD = null; // to be worked on
+            this.tunesSD = null;
     }
     
     /**
@@ -112,6 +112,40 @@ public class Shuffler {
     }
 
 
+    /**
+     * getter method to return the track list
+     * @return a list of tracks
+     */
+    public List<String> getTracks() {
+        return this.tracks;
+    }
+
+
+    /**
+     * getter method to return the album list
+     * @return a list of albums
+     */
+    public List<String> getAlbums() {
+        return this.albums;
+    }
+
+
+    /**
+     * getter method to return a list of artists
+     * @return a list of artists
+     */
+    public List<String> getArtists() {
+        return this.artists;
+    }
+
+    
+    /**
+     * getter method to return a list of lists?
+     * @return a list of lists
+     */
+    public List<String> getLists() {
+        return this.lists;
+    }
 
 
 

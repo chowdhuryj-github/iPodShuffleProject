@@ -11,29 +11,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import iPodShuffleJava.Shuffler;
 
+/**
+ * the main class for the iPod Shuffle
+ */
 public class iPodShuffle {
-
-
-
-    public static void main(String[] args) {
-
-        String pathOne = "C:/GitHub/iPodShuffleProject/Salvin";
-        String pathTwo = "C:/GitHub/iPodShuffleProject/Chowdhury";
-        String prefix = "C:/GitHub";
-
-        System.out.println("Hello there!");
-
-        // testing
-        // createDirectory("C:/GitHub/iPodShuffleProject/Salvin");
-        // System.out.println(encodingCheck("Salvin"));
-        // System.out.println(execExistsInPath("java --version"));
-        // System.out.println(splitPath(pathOne));
-        // System.out.println(getRelativePath(pathOne, pathTwo));
-        // System.out.println("Calling isPathPrefix() " + isPathPrefix(pathOne, prefix));
-
-    }
 
 
     /**
@@ -150,10 +132,10 @@ public class iPodShuffle {
      * @param path the path we have
      * @return confirms if directory is inside 
      */
-    public static boolean isPathPrefix(String prefix, String path) {
+    public static boolean isPathPrefix(String path, String prefix) {
 
-        Path paths = Paths.get(prefix).toAbsolutePath().normalize();     // .normalize() removes redundant things like ..
-        Path prefixPath = Paths.get(path).toAbsolutePath().normalize();  // .toAbsolutePath() adds in the root directories and stuff
+        Path paths = Paths.get(path).toAbsolutePath().normalize();    
+        Path prefixPath = Paths.get(prefix).toAbsolutePath().normalize();  
 
         return paths.startsWith(prefixPath);
 

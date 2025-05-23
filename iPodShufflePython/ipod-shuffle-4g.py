@@ -243,8 +243,10 @@ class Text2Speech(object):
 
 
 # class for entry in the database
+# done
 class Record(object):
 
+    # done
     def __init__(self, parent):
         self.parent = parent
         self._struct = collections.OrderedDict([])
@@ -254,14 +256,17 @@ class Record(object):
         self.rename = parent.rename
         self.trackgain = parent.trackgain
 
+    # done
     def __getitem__(self, item):
         if item not in list(self._struct.keys()):
             raise KeyError
         return self._fields.get(item, self._struct[item][1])
 
+    # done
     def __setitem__(self, item, value):
         self._fields[item] = value
 
+    # done
     def construct(self):
         output = bytes()
         for i in list(self._struct.keys()):
@@ -270,6 +275,7 @@ class Record(object):
         return output
 
     # code that converts song's name to internal ID to .wav and adds it to the directory
+    # not needed
     def text_to_speech(self, text, dbid, playlist = False):
         if self.track_voiceover and not playlist or self.playlist_voiceover and playlist:
             # Create the voiceover wav file
@@ -279,6 +285,7 @@ class Record(object):
         return False
 
     # removes root directory and converts computer path into internal iPod path
+    # done
     def path_to_ipod(self, filename):
         if os.path.commonprefix([os.path.abspath(filename), self.base]) != self.base:
             raise IOError("Cannot get Ipod filename, since file is outside the IPOD path")
@@ -289,10 +296,12 @@ class Record(object):
         return ipodname
     
     # converts iPod path to computer path
+    # done
     def ipod_to_path(self, ipodname):
         return os.path.abspath(os.path.join(self.base, os.path.sep.join(ipodname.split("/"))))
 
     # refers back to the Shuffler object
+    # done
     @property
     def shuffledb(self):
         parent = self.parent
@@ -301,26 +310,31 @@ class Record(object):
         return parent
 
     # returns iPod's root folder
+    # done
     @property
     def base(self):
         return self.shuffledb.path
 
     # returns all the songs that are added
+    # done
     @property
     def tracks(self):
         return self.shuffledb.tracks
 
     # returns all the albums
+    # done
     @property
     def albums(self):
         return self.shuffledb.albums
 
     # returns all artists
+    # done
     @property
     def artists(self):
         return self.shuffledb.artists
 
     # returns all playlists
+    # done
     @property
     def lists(self):
         return self.shuffledb.lists
