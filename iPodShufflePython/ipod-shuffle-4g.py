@@ -561,6 +561,7 @@ class PlaylistHeader(Record):
 class Playlist(Record):
 
     # set up a playlist record
+    # done
     def __init__(self, parent):
         self.listtracks = []
         Record.__init__(self, parent)
@@ -575,6 +576,7 @@ class Playlist(Record):
                                               ])
 
     # building the master playlist that contains all tracks 
+    # done
     def set_master(self, tracks):
         # By default use "All Songs" builtin voiceover (dbid all zero)
         # Else generate alternative "All Songs" to fit the speaker voice of other playlists
@@ -585,6 +587,7 @@ class Playlist(Record):
         self.listtracks = tracks
 
     # reads lines of m3u
+    # done
     def populate_m3u(self, data):
         listtracks = []
         for i in data:
@@ -596,6 +599,7 @@ class Playlist(Record):
         return listtracks
 
     # reads lines of pls
+    # done
     def populate_pls(self, data):
         sorttracks = []
         for i in data:
@@ -612,11 +616,14 @@ class Playlist(Record):
         return listtracks
 
     # collects all audio diles and returns absolute file paths
+    # done
     def populate_directory(self, playlistpath, recursive = True):
+
         # Add all tracks inside the folder and its subfolders recursively.
         # Folders containing no music and only a single Album
         # would generate duplicated playlists. That is intended and "wont fix".
         # Empty folders (inside the music path) will generate an error -> "wont fix".
+
         listtracks = []
         for (dirpath, dirnames, filenames) in os.walk(playlistpath):
             dirnames.sort()
@@ -633,6 +640,7 @@ class Playlist(Record):
         return listtracks
 
     # produces a absolute file path
+    # done
     def remove_relatives(self, relative, filename):
         base = os.path.dirname(os.path.abspath(filename))
         if not os.path.exists(relative):
@@ -641,6 +649,7 @@ class Playlist(Record):
         return fullPath
 
     # sets up voice over for a playlist
+    # done
     def populate(self, obj):
         # Create a playlist of the folder and all subfolders
         if type(obj) == type(()):
@@ -784,7 +793,7 @@ class Shuffler(object):
         print("Albums", len(self.albums))
         print("Artists", len(self.artists))
         print("Playlists", len(self.lists))
-        
+
 # <---------------------------------------------------------------------------------------------------------------------------------------------->
 
 #
