@@ -15,20 +15,14 @@ import re
 import tempfile
 import signal
 
-# importing a external library
+# External libraries
 try:
     import mutagen
 except ImportError:
     mutagen = None
 
-# the audio extensions
 audio_ext = (".mp3", ".m4a", ".m4b", ".m4p", ".aa", ".wav")
-
-# playlist fiel extension
 list_ext = (".pls", ".m3u")
-
-# creates a directory if it doesn't exist
-# done
 def make_dir_if_absent(path):
     try:
         os.makedirs(path)
@@ -36,8 +30,6 @@ def make_dir_if_absent(path):
         if exc.errno != errno.EEXIST:
             raise
 
-# returns false for latin characters
-# done
 def raises_unicode_error(str):
     try:
         str.encode('latin-1')
@@ -45,14 +37,10 @@ def raises_unicode_error(str):
     except (UnicodeEncodeError, UnicodeDecodeError):
         return True
 
-# converts non-latin characters into hash code
-# skipping this, not needed
 def hash_error_unicode(item):
     item_bytes = item.encode('utf-8')
     return "".join(["{0:02X}".format(ord(x)) for x in reversed(hashlib.md5(item_bytes).hexdigest()[:8])])
 
-# looks for non-latin characters and then hashes them
-# skipping this, not needed
 def validate_unicode(path):
     path_list = path.split('/')
     last_raise = False
@@ -65,8 +53,6 @@ def validate_unicode(path):
     extension = os.path.splitext(path)[1].lower()
     return "/".join(path_list) + (extension if last_raise and extension in audio_ext else '')
 
-# checks to see if command can be run or not in the system
-# done
 def exec_exists_in_path(command):
     with open(os.devnull, 'w') as FNULL:
         try:
@@ -76,24 +62,16 @@ def exec_exists_in_path(command):
         except OSError as e:
             return False
 
-# splits the path
-# done
 def splitpath(path):
     return path.split(os.sep)
 
-# finds shared starting folder
-# done
 def get_relpath(path, basepath):
     commonprefix = os.sep.join(os.path.commonprefix(list(map(splitpath, [path, basepath]))))
     return os.path.relpath(path, commonprefix)
 
-# checks if a directory is inside of another directory
-# done
 def is_path_prefix(prefix, path):
     return prefix == os.sep.join(os.path.commonprefix(list(map(splitpath, [prefix, path]))))
 
-# groups the songs by the metadata
-# not needed
 def group_tracks_by_id3_template(tracks, template):
     grouped_tracks_dict = {}
     template_vars = set(re.findall(r'{.*?}', template))
@@ -118,16 +96,9 @@ def group_tracks_by_id3_template(tracks, template):
 
     return sorted(grouped_tracks_dict.items())
 
-# <---------------------------------------------------------------------------------------------------------------------------------------------->
-
-# clss for text 2 speech
-# entire class not needed
 class Text2Speech(object):
-
-    # list of text to speech programs
     valid_tts = {'pico2wave': True, 'RHVoice': True, 'espeak': True, 'say': True}
 
-    # checks if the TTS programs are existent or not
     @staticmethod
     def check_support():
         voiceoverAvailable = False
@@ -164,7 +135,6 @@ class Text2Speech(object):
         # Otherwise this will result in silent voiceover for tracks and "Playlist N" for playlists.
         return voiceoverAvailable
 
-    # generates a .wav file using a TTS program if the file doesn't exist
     @staticmethod
     def text2speech(out_wav_path, text):
         # Skip voiceover generation if a track with the same name is used.
@@ -197,7 +167,6 @@ class Text2Speech(object):
             lang = 'ru-RU'
         return lang
 
-    # if pico2wave exists, then generate a english .wav file
     @staticmethod
     def pico2wave(out_wav_path, unicodetext):
         if not Text2Speech.valid_tts['pico2wave']:
@@ -205,7 +174,6 @@ class Text2Speech(object):
         subprocess.call(["pico2wave", "-l", "en-GB", "-w", out_wav_path, '--', unicodetext])
         return True
 
-    # if say exists, then generate a english .wav file
     @staticmethod
     def say(out_wav_path, unicodetext):
         if not Text2Speech.valid_tts['say']:
@@ -213,7 +181,6 @@ class Text2Speech(object):
         subprocess.call(["say", "-o", out_wav_path, '--data-format=LEI16', '--file-format=WAVE', '--', unicodetext])
         return True
 
-    # if eSpeak exists, then generate a english .wav file
     @staticmethod
     def espeak(out_wav_path, unicodetext):
         if not Text2Speech.valid_tts['espeak']:
@@ -221,7 +188,6 @@ class Text2Speech(object):
         subprocess.call(["espeak", "-v", "english_rp", "-s", "150", "-w", out_wav_path, '--', unicodetext])
         return True
 
-    # if rhvoice exists, then generate a russian .wav file
     @staticmethod
     def rhvoice(out_wav_path, unicodetext):
         if not Text2Speech.valid_tts['RHVoice']:
@@ -237,16 +203,10 @@ class Text2Speech(object):
 
         os.remove(tmp_file.name)
         return True
-    
-
-# <---------------------------------------------------------------------------------------------------------------------------------------------->
 
 
-# class for entry in the database
-# done
 class Record(object):
 
-    # done
     def __init__(self, parent):
         self.parent = parent
         self._struct = collections.OrderedDict([])
@@ -256,17 +216,14 @@ class Record(object):
         self.rename = parent.rename
         self.trackgain = parent.trackgain
 
-    # done
     def __getitem__(self, item):
         if item not in list(self._struct.keys()):
             raise KeyError
         return self._fields.get(item, self._struct[item][1])
 
-    # done
     def __setitem__(self, item, value):
         self._fields[item] = value
 
-    # done
     def construct(self):
         output = bytes()
         for i in list(self._struct.keys()):
@@ -274,8 +231,6 @@ class Record(object):
             output += struct.pack("<" + fmt, self._fields.get(i, default))
         return output
 
-    # code that converts song's name to internal ID to .wav and adds it to the directory
-    # not needed
     def text_to_speech(self, text, dbid, playlist = False):
         if self.track_voiceover and not playlist or self.playlist_voiceover and playlist:
             # Create the voiceover wav file
@@ -284,8 +239,6 @@ class Record(object):
             return Text2Speech.text2speech(path, text)
         return False
 
-    # removes root directory and converts computer path into internal iPod path
-    # done
     def path_to_ipod(self, filename):
         if os.path.commonprefix([os.path.abspath(filename), self.base]) != self.base:
             raise IOError("Cannot get Ipod filename, since file is outside the IPOD path")
@@ -294,14 +247,10 @@ class Record(object):
             baselen -= 1
         ipodname = "/".join(os.path.abspath(filename)[baselen:].split(os.path.sep))
         return ipodname
-    
-    # converts iPod path to computer path
-    # done
+
     def ipod_to_path(self, ipodname):
         return os.path.abspath(os.path.join(self.base, os.path.sep.join(ipodname.split("/"))))
 
-    # refers back to the Shuffler object
-    # done
     @property
     def shuffledb(self):
         parent = self.parent
@@ -309,42 +258,27 @@ class Record(object):
             parent = parent.parent
         return parent
 
-    # returns iPod's root folder
-    # done
     @property
     def base(self):
         return self.shuffledb.path
 
-    # returns all the songs that are added
-    # done
     @property
     def tracks(self):
         return self.shuffledb.tracks
 
-    # returns all the albums
-    # done
     @property
     def albums(self):
         return self.shuffledb.albums
 
-    # returns all artists
-    # done
     @property
     def artists(self):
         return self.shuffledb.artists
 
-    # returns all playlists
-    # done
     @property
     def lists(self):
         return self.shuffledb.lists
-    
-# <---------------------------------------------------------------------------------------------------------------------------------------------->
 
-# a table of contents type of thing
 class TunesSD(Record):
-
-    # table of contents
     def __init__(self, parent):
         Record.__init__(self, parent)
         self.track_header = TrackHeader(self)
@@ -364,10 +298,8 @@ class TunesSD(Record):
                            ("playlist_header_offset", ("I", 0)),
                            ("unknown4", ("20s", b"\x00" * 20)),
                                                ])
-    
-    # [64-byte header] + [track-list bytes] + [playlist-list bytes]
-    def construct(self):
 
+    def construct(self):
         # The header is a fixed length, so no need to calculate it
         self.track_header.base_offset = 64
         track_header = self.track_header.construct()
@@ -383,15 +315,8 @@ class TunesSD(Record):
 
         output = Record.construct(self)
         return output + track_header + play_header
-    
-# <---------------------------------------------------------------------------------------------------------------------------------------------->
 
-# table of contents for each record
-# done
 class TrackHeader(Record):
-
-    # blueprint for building the track list section
-    # done
     def __init__(self, parent):
         self.base_offset = 0
         Record.__init__(self, parent)
@@ -401,9 +326,7 @@ class TrackHeader(Record):
                            ("number_of_tracks", ("I", 0)),
                            ("unknown1", ("Q", 0)),
                                              ])
-    
-    # building the complete track list section
-    # done
+
     def construct(self):
         self["number_of_tracks"] = len(self.tracks)
         self["total_length"] = 20 + (len(self.tracks) * 4)
@@ -418,15 +341,9 @@ class TrackHeader(Record):
             output += struct.pack("I", self.base_offset + self["total_length"] + len(track_chunk))
             track_chunk += track.construct()
         return output + track_chunk
-    
-# <---------------------------------------------------------------------------------------------------------------------------------------------->
 
-# record for a song
-# done
 class Track(Record):
 
-    # constructor for the record
-    # done
     def __init__(self, parent):
         Record.__init__(self, parent)
         self._struct = collections.OrderedDict([
@@ -457,8 +374,6 @@ class Track(Record):
                            ("unknown5", ("32s", b"\x00" * 32)),
                            ])
 
-    # filling in the details of the record
-    # done
     def populate(self, filename):
         self["filename"] = self.path_to_ipod(filename).encode('utf-8')
 
@@ -496,18 +411,12 @@ class Track(Record):
                     text = " - ".join(audio.get("title", "") + audio.get("artist", ""))
 
         # Handle the VoiceOverData
-        # not needed
         if isinstance(text, str):
             text = text.encode('utf-8', 'ignore')
         self["dbid"] = hashlib.md5(text).digest()[:8]
         self.text_to_speech(text, self["dbid"])
 
-# <---------------------------------------------------------------------------------------------------------------------------------------------->
-
-# class for building the entire playlist
 class PlaylistHeader(Record):
-
-    # constructor for the playlist
     def __init__(self, parent):
         self.base_offset = 0
         Record.__init__(self, parent)
@@ -520,7 +429,7 @@ class PlaylistHeader(Record):
                           ("number_of_non_audiobook_lists", ("2s", b"\xFF\xFF")),
                           ("unknown2", ("2s", b"\x00" * 2)),
                                               ])
-        
+
     def construct(self, tracks):
         # Build the master list
         masterlist = Playlist(self)
@@ -553,15 +462,8 @@ class PlaylistHeader(Record):
             offset += len(chunks[i])
 
         return output + b"".join(chunks)
-    
-# <---------------------------------------------------------------------------------------------------------------------------------------------->
 
-# one playlist entry in the iPod's database
-# done
 class Playlist(Record):
-
-    # set up a playlist record
-    # done
     def __init__(self, parent):
         self.listtracks = []
         Record.__init__(self, parent)
@@ -575,8 +477,6 @@ class Playlist(Record):
                           ("unknown1", ("16s", b"\x00" * 16))
                                               ])
 
-    # building the master playlist that contains all tracks 
-    # done
     def set_master(self, tracks):
         # By default use "All Songs" builtin voiceover (dbid all zero)
         # Else generate alternative "All Songs" to fit the speaker voice of other playlists
@@ -586,8 +486,6 @@ class Playlist(Record):
         self["listtype"] = 1
         self.listtracks = tracks
 
-    # reads lines of m3u
-    # done
     def populate_m3u(self, data):
         listtracks = []
         for i in data:
@@ -598,8 +496,6 @@ class Playlist(Record):
                 listtracks.append(path)
         return listtracks
 
-    # reads lines of pls
-    # done
     def populate_pls(self, data):
         sorttracks = []
         for i in data:
@@ -615,15 +511,11 @@ class Playlist(Record):
         listtracks = [ x for (_, x) in sorted(sorttracks) ]
         return listtracks
 
-    # collects all audio diles and returns absolute file paths
-    # done
     def populate_directory(self, playlistpath, recursive = True):
-
         # Add all tracks inside the folder and its subfolders recursively.
         # Folders containing no music and only a single Album
         # would generate duplicated playlists. That is intended and "wont fix".
         # Empty folders (inside the music path) will generate an error -> "wont fix".
-
         listtracks = []
         for (dirpath, dirnames, filenames) in os.walk(playlistpath):
             dirnames.sort()
@@ -639,8 +531,6 @@ class Playlist(Record):
                 break
         return listtracks
 
-    # produces a absolute file path
-    # done
     def remove_relatives(self, relative, filename):
         base = os.path.dirname(os.path.abspath(filename))
         if not os.path.exists(relative):
@@ -648,8 +538,6 @@ class Playlist(Record):
         fullPath = relative
         return fullPath
 
-    # sets up voice over for a playlist
-    # done
     def populate(self, obj):
         # Create a playlist of the folder and all subfolders
         if type(obj) == type(()):
@@ -682,8 +570,6 @@ class Playlist(Record):
         self["dbid"] = hashlib.md5(text.encode('utf-8')).digest()[:8]
         self.text_to_speech(text, self["dbid"], True)
 
-    # serialize the playlist into bytes
-    # done
     def construct(self, tracks):
         self["total_length"] = 44 + (4 * len(self.listtracks))
         self["number_of_songs"] = 0
@@ -707,13 +593,7 @@ class Playlist(Record):
         output = Record.construct(self)
         return output + chunks
 
-# <---------------------------------------------------------------------------------------------------------------------------------------------->
-
-# the iPod builder class
 class Shuffler(object):
-
-    # the constructor for the shuffler
-    # done
     def __init__(self, path, track_voiceover=False, playlist_voiceover=False, rename=False, trackgain=0, auto_dir_playlists=None, auto_id3_playlists=None):
         self.path = os.path.abspath(path)
         self.tracks = []
@@ -728,8 +608,6 @@ class Shuffler(object):
         self.auto_dir_playlists = auto_dir_playlists
         self.auto_id3_playlists = auto_id3_playlists
 
-    # prepared iPod directory for a fresh database
-    # done
     def initialize(self):
       # remove existing voiceover files (they are either useless or will be overwritten anyway)
       for dirname in ('iPod_Control/Speakable/Playlists', 'iPod_Control/Speakable/Tracks'):
@@ -737,7 +615,6 @@ class Shuffler(object):
       for dirname in ('iPod_Control/iTunes', 'iPod_Control/Music', 'iPod_Control/Speakable/Playlists', 'iPod_Control/Speakable/Tracks'):
           make_dir_if_absent(os.path.join(self.path, dirname))
 
-    # a debug printer
     def dump_state(self):
         print("Shuffle DB state")
         print("Tracks", self.tracks)
@@ -745,7 +622,6 @@ class Shuffler(object):
         print("Artists", self.artists)
         print("Playlists", self.lists)
 
-    # used to look for music library and playlists
     def populate(self):
         self.tunessd = TunesSD(self)
         for (dirpath, dirnames, filenames) in os.walk(self.path):
@@ -778,7 +654,6 @@ class Shuffler(object):
                 print("Error: No mutagen found. Cannot generate auto-id3-playlists.")
                 sys.exit(1)
 
-    # writes to the database
     def write_database(self):
         print("Writing database. This may take a while...")
         with open(os.path.join(self.path, "iPod_Control", "iTunes", "iTunesSD"), "wb") as f:
@@ -795,8 +670,6 @@ class Shuffler(object):
         print("Artists", len(self.artists))
         print("Playlists", len(self.lists))
 
-# <---------------------------------------------------------------------------------------------------------------------------------------------->
-
 #
 # Read all files from the directory
 # Construct the appropriate iTunesDB file
@@ -805,7 +678,6 @@ class Shuffler(object):
 # Use SVOX pico2wave and RHVoice to produce voiceover data
 #
 
-# looks for names that can't be encoded in latin
 def check_unicode(path):
     ret_flag = False # True if there is a recognizable file within this level
     for item in os.listdir(path):
@@ -827,7 +699,6 @@ def check_unicode(path):
                 os.rename(src, dest)
     return ret_flag
 
-# converts input into a integer
 def nonnegative_int(string):
     try:
         intval = int(string)
@@ -838,7 +709,6 @@ def nonnegative_int(string):
         raise argparse.ArgumentTypeError("Track gain value should be in range 0-99")
     return intval
 
-# checks validity of the path
 def checkPathValidity(path):
     if not os.path.isdir(result.path):
         print("Error finding IPod directory. Maybe it is not connected or mounted?")
@@ -848,12 +718,10 @@ def checkPathValidity(path):
         print('Unable to get write permissions in the IPod directory')
         sys.exit(1)
 
-# designed to handle a interrupt
 def handle_interrupt(signal, frame):
     print("Interrupt detected, exiting...")
     sys.exit(1)
 
-# the entry point for the program
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, handle_interrupt)
 
