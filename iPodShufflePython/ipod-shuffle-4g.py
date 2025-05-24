@@ -521,7 +521,6 @@ class PlaylistHeader(Record):
                           ("unknown2", ("2s", b"\x00" * 2)),
                                               ])
         
-    # builds the entire playlist
     def construct(self, tracks):
         # Build the master list
         masterlist = Playlist(self)
@@ -558,6 +557,7 @@ class PlaylistHeader(Record):
 # <---------------------------------------------------------------------------------------------------------------------------------------------->
 
 # one playlist entry in the iPod's database
+# done
 class Playlist(Record):
 
     # set up a playlist record
@@ -683,6 +683,7 @@ class Playlist(Record):
         self.text_to_speech(text, self["dbid"], True)
 
     # serialize the playlist into bytes
+    # done
     def construct(self, tracks):
         self["total_length"] = 44 + (4 * len(self.listtracks))
         self["number_of_songs"] = 0
